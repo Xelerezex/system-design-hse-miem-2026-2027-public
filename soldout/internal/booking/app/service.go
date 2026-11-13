@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,6 +26,9 @@ import (
 // Tx — операции внутри транзакции.
 type Tx interface {
 	LockSeat(ctx context.Context, eventID uuid.UUID, seatID int64) error
+	LockSector(ctx context.Context, eventID, sectorID uuid.UUID) error
+	CountSectorSales(ctx context.Context, eventID, sectorID uuid.UUID) (int, error)
+	HoldSectors(ctx context.Context, holdIDs []uuid.UUID) ([]uuid.UUID, error)
 	CountUserHolds(ctx context.Context, eventID, userID uuid.UUID) (int, error)
 	SeatSold(ctx context.Context, eventID uuid.UUID, seatID int64) (bool, error)
 	InsertHold(ctx context.Context, h domain.Hold) error
@@ -61,10 +65,9 @@ type ReleasedHold struct {
 
 // Options — настройки сервиса.
 type Options struct {
-	HoldTTL          time.Duration
-	TicketPriceMinor int64
-	Faults           faults.Flags
-	Events           eventbus.Publisher // события SeatStateChanged после commit; nil = не публиковать
+	HoldTTL time.Duration
+	Faults  faults.Flags
+	Events  eventbus.Publisher // события SeatStateChanged после commit; nil = не публиковать
 }
 
 // Service — реализация api.Service.
@@ -119,7 +122,26 @@ func (s *Service) CreateHold(ctx context.Context, in api.CreateHoldInput) (api.H
 	}
 
 	hold := domain.NewHold(in.EventID, in.SeatID, in.UserID, s.now(), s.opts.HoldTTL)
+	rule, err := s.catalog.GetSectorPrice(ctx, in.EventID, seat.SectorID)
+	if err != nil {
+		return api.Hold{}, err
+	}
 	err = s.store.InTx(ctx, func(tx Tx) error {
+		// Pricing reads must serialize with payment confirmation for the same sector.
+		if err := tx.LockSector(ctx, in.EventID, seat.SectorID); err != nil {
+			return err
+		}
+		soldCount, err := tx.CountSectorSales(ctx, in.EventID, seat.SectorID)
+		if err != nil {
+			return err
+		}
+		price, err := domain.PriceForSoldCount(rule.BasePriceMinor, rule.StepSeats, rule.StepPercent, soldCount)
+		if err != nil {
+			return err
+		}
+		hold.SectorID = seat.SectorID
+		hold.PriceMinor = price
+		hold.SoldCountAtHold = soldCount
 		// Сериализуем конкурентов на одно место. На L1 — без try-lock: очередь на «горячем» месте (см. занятие 2).
 		if err := tx.LockSeat(ctx, in.EventID, in.SeatID); err != nil {
 			return err
@@ -212,7 +234,7 @@ func (s *Service) CreateOrder(ctx context.Context, in api.CreateOrderInput) (api
 		if len(holds) != len(uniqueIDs(in.HoldIDs)) {
 			return api.ErrHoldNotFound
 		}
-		order, err = domain.NewOrder(holds, in.UserID, in.IdempotencyKey, s.opts.TicketPriceMinor, s.now())
+		order, err = domain.NewOrder(holds, in.UserID, in.IdempotencyKey, s.now())
 		if err != nil {
 			return err
 		}
@@ -353,6 +375,17 @@ func (s *Service) payOrder(ctx context.Context, in api.PayOrderInput) (api.Order
 		if o.Status == api.OrderPaid { // гонка двух pay
 			paid = o
 			return nil
+		}
+		// Same lock order in every pay: sector locks first, hold row locks second.
+		sectors, err := tx.HoldSectors(ctx, o.HoldIDs)
+		if err != nil {
+			return err
+		}
+		sort.Slice(sectors, func(i, j int) bool { return sectors[i].String() < sectors[j].String() })
+		for _, sectorID := range sectors {
+			if err := tx.LockSector(ctx, o.EventID, sectorID); err != nil {
+				return err
+			}
 		}
 		holds, err := tx.GetHoldsForUpdate(ctx, o.HoldIDs)
 		if err != nil {

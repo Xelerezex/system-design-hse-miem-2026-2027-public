@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: soldout API
-  version: "1.1.0-lesson-2"
+  version: "1.2.0-hw1-v2"
   description: |
     HTTP API системы продажи билетов `soldout` (модульный монолит, занятие 1).
     Аутентификации нет (появится на занятии 6 через Gravitee + Keycloak). Все мутирующие операции
@@ -105,7 +105,7 @@ paths:
   /v1/holds:
     post:
       tags: [booking]
-      summary: Удержать место (hold на 10 минут)
+      summary: Удержать место (hold на 10 минут) с фиксацией динамической цены
       parameters:
         - name: X-Admission-Token
           in: header
@@ -149,7 +149,7 @@ paths:
   /v1/orders:
     post:
       tags: [booking]
-      summary: Создать заказ из hold'ов
+      summary: Создать заказ из hold'ов с суммой сохранённых цен
       parameters:
         - name: Idempotency-Key
           in: header
@@ -339,6 +339,9 @@ components:
         id: { type: string, format: uuid }
         event_id: { type: string, format: uuid }
         seat_id: { type: integer, format: int64 }
+        sector_id: { type: string, format: uuid }
+        price_minor: { type: integer, format: int64, minimum: 1, description: Price frozen when hold is created }
+        sold_count_at_hold: { type: integer, minimum: 0, description: Confirmed seats at the time of the pricing decision }
         user_id: { type: string, format: uuid }
         status: { type: string, enum: [active, released, confirmed] }
         expires_at: { type: string, format: date-time }

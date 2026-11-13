@@ -90,13 +90,16 @@ const MaxTicketsPerUser = 4
 
 // Hold — удержание места.
 type Hold struct {
-	ID        uuid.UUID  `json:"id"`
-	EventID   uuid.UUID  `json:"event_id"`
-	SeatID    int64      `json:"seat_id"`
-	UserID    uuid.UUID  `json:"user_id"`
-	Status    HoldStatus `json:"status"`
-	ExpiresAt time.Time  `json:"expires_at"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID              uuid.UUID  `json:"id"`
+	EventID         uuid.UUID  `json:"event_id"`
+	SeatID          int64      `json:"seat_id"`
+	SectorID        uuid.UUID  `json:"sector_id"`
+	PriceMinor      int64      `json:"price_minor"`
+	SoldCountAtHold int        `json:"sold_count_at_hold"`
+	UserID          uuid.UUID  `json:"user_id"`
+	Status          HoldStatus `json:"status"`
+	ExpiresAt       time.Time  `json:"expires_at"`
+	CreatedAt       time.Time  `json:"created_at"`
 }
 
 // Order — заказ.

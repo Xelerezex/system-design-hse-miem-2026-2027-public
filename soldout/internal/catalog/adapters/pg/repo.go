@@ -77,6 +77,22 @@ func (r *Repo) GetSeat(ctx context.Context, id int64) (domain.Seat, error) {
 	return s, nil
 }
 
+// GetSectorPrice — rules live in catalog; booking consumes only the public port.
+func (r *Repo) GetSectorPrice(ctx context.Context, eventID, sectorID uuid.UUID) (api.SectorPrice, error) {
+	var price api.SectorPrice
+	err := r.db.QueryRow(ctx, `/* catalog.get_sector_price */
+        SELECT base_price_minor, step_seats, step_percent
+        FROM sector_prices WHERE event_id = $1 AND sector_id = $2`, eventID, sectorID).
+		Scan(&price.BasePriceMinor, &price.StepSeats, &price.StepPercent)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return price, api.ErrSectorNotFound
+	}
+	if err != nil {
+		return price, fmt.Errorf("catalog/pg: get sector price: %w", err)
+	}
+	return price, nil
+}
+
 // SectorsByVenue — секторы площадки.
 func (r *Repo) SectorsByVenue(ctx context.Context, venueID uuid.UUID) ([]domain.Sector, error) {
 	rows, err := r.db.Query(ctx, `/* catalog.sectors_by_venue */

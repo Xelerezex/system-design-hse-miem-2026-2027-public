@@ -29,6 +29,7 @@ type Repository interface {
 	ListEvents(ctx context.Context) ([]domain.Event, error)
 	GetEvent(ctx context.Context, id uuid.UUID) (domain.Event, error)
 	GetSeat(ctx context.Context, id int64) (domain.Seat, error)
+	GetSectorPrice(ctx context.Context, eventID, sectorID uuid.UUID) (api.SectorPrice, error)
 	GetSector(ctx context.Context, id uuid.UUID) (domain.Sector, error)
 	SectorsByVenue(ctx context.Context, venueID uuid.UUID) ([]domain.Sector, error)
 	SeatsBySector(ctx context.Context, sectorID uuid.UUID) ([]domain.Seat, error)
@@ -123,6 +124,11 @@ func (s *Service) GetSeat(ctx context.Context, seatID int64) (api.Seat, error) {
 		return api.Seat{}, err
 	}
 	return seat.ToAPI(), nil
+}
+
+// GetSectorPrice — immutable pricing rule for a catalog event/sector.
+func (s *Service) GetSectorPrice(ctx context.Context, eventID, sectorID uuid.UUID) (api.SectorPrice, error) {
+	return s.repo.GetSectorPrice(ctx, eventID, sectorID)
 }
 
 // SeatMap — сводка по секторам из проекции (один GROUP BY вместо 40 000 строк).

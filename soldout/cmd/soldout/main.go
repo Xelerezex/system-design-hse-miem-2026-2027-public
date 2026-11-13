@@ -142,7 +142,7 @@ func run() error {
 	// notification с занятия 4 — отдельный сервис cmd/notifier (событие OrderPaidEvent), в монолите его нет
 	ticketingSvc := ticketingapp.New(ticketingpg.New(pool), logger)
 	bookingSvc := bookingapp.New(bookingStore, catalogSvc, queueSvc, paymentSvc, ticketingSvc,
-		bookingapp.Options{HoldTTL: cfg.HoldTTL, TicketPriceMinor: cfg.TicketPriceMinor, Faults: flags, Events: bus}, logger)
+		bookingapp.Options{HoldTTL: cfg.HoldTTL, Faults: flags, Events: bus}, logger)
 
 	// --- HTTP ---
 	r := chi.NewRouter()

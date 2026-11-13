@@ -47,6 +47,13 @@ var invariants = []invariant{
 		) d`},
 }
 
+// I7: hold prices are immutable; the order amount is the sum of those prices.
+var invariantI7 = invariant{"I7", "сумма заказа равна сумме зафиксированных цен hold", `
+    SELECT count(*) FROM orders o WHERE o.amount * 100 <> (
+        SELECT coalesce(sum(h.price_minor), 0)
+        FROM order_items oi JOIN holds h ON h.id = oi.hold_id WHERE oi.order_id = o.id
+    )`}
+
 var invariantI6 = invariant{"I6", "проекция карты (catalog_seat_state) совпадает с истиной (holds) — с занятия 2", `
 		SELECT (SELECT count(*) FROM (
 			SELECT h.event_id, h.seat_id, CASE h.status WHEN 'confirmed' THEN 'sold' ELSE 'held' END AS state
@@ -88,7 +95,7 @@ func main() {
 	}
 	defer pool.Close()
 
-	checks := invariants
+	checks := append(append([]invariant{}, invariants...), invariantI7)
 	if *withI6 {
 		checks = append(checks, invariantI6)
 	}

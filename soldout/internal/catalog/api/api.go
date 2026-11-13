@@ -55,6 +55,13 @@ type Seat struct {
 	SeatNo   int       `json:"num"`
 }
 
+// SectorPrice — pricing rule for an event's sector, stored in catalog.
+type SectorPrice struct {
+	BasePriceMinor int64
+	StepSeats      int
+	StepPercent    int
+}
+
 // SeatMap — сводка карты зала по секторам (с занятия 2 полная карта не отдаётся: см. SectorSeatMap).
 type SeatMap struct {
 	EventID uuid.UUID       `json:"event_id"`
@@ -122,6 +129,7 @@ type Service interface {
 	ListEvents(ctx context.Context) ([]Event, error)
 	GetEvent(ctx context.Context, id uuid.UUID) (Event, error)
 	GetSeat(ctx context.Context, seatID int64) (Seat, error)
+	GetSectorPrice(ctx context.Context, eventID, sectorID uuid.UUID) (SectorPrice, error)
 	SeatMap(ctx context.Context, eventID uuid.UUID) (SeatMap, error)
 	SectorSeatMap(ctx context.Context, eventID, sectorID uuid.UUID) (SectorSeatMapResult, error)
 	CreateEvent(ctx context.Context, in CreateEventInput) (Event, error)

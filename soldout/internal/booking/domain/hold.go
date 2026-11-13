@@ -12,13 +12,16 @@ import (
 
 // Hold — удержание места.
 type Hold struct {
-	ID        uuid.UUID
-	EventID   uuid.UUID
-	SeatID    int64
-	UserID    uuid.UUID
-	Status    api.HoldStatus
-	ExpiresAt time.Time
-	CreatedAt time.Time
+	ID              uuid.UUID
+	EventID         uuid.UUID
+	SeatID          int64
+	SectorID        uuid.UUID
+	PriceMinor      int64
+	SoldCountAtHold int
+	UserID          uuid.UUID
+	Status          api.HoldStatus
+	ExpiresAt       time.Time
+	CreatedAt       time.Time
 }
 
 // NewHold создаёт активный hold на ttl.
@@ -61,5 +64,5 @@ func CanHoldMore(current int) bool { return current < api.MaxTicketsPerUser }
 
 // ToAPI — DTO.
 func (h Hold) ToAPI() api.Hold {
-	return api.Hold{ID: h.ID, EventID: h.EventID, SeatID: h.SeatID, UserID: h.UserID, Status: h.Status, ExpiresAt: h.ExpiresAt, CreatedAt: h.CreatedAt}
+	return api.Hold{ID: h.ID, EventID: h.EventID, SeatID: h.SeatID, SectorID: h.SectorID, PriceMinor: h.PriceMinor, SoldCountAtHold: h.SoldCountAtHold, UserID: h.UserID, Status: h.Status, ExpiresAt: h.ExpiresAt, CreatedAt: h.CreatedAt}
 }

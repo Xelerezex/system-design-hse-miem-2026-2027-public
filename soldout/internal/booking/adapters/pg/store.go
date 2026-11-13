@@ -69,6 +69,45 @@ func (q *queries) LockSeat(ctx context.Context, eventID uuid.UUID, seatID int64)
 	return nil
 }
 
+// LockSector synchronizes hold pricing and paid-order confirmation on an event sector.
+func (q *queries) LockSector(ctx context.Context, eventID, sectorID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, `/* booking.lock_sector */ SELECT pg_advisory_xact_lock(hashtext($1::text), hashtext($2::text))`, eventID, sectorID)
+	if err != nil {
+		return fmt.Errorf("booking/pg: lock sector: %w", err)
+	}
+	return nil
+}
+
+// CountSectorSales intentionally counts confirmed holds for the unoptimized baseline.
+func (q *queries) CountSectorSales(ctx context.Context, eventID, sectorID uuid.UUID) (int, error) {
+	var n int
+	err := q.db.QueryRow(ctx, `/* booking.count_sector_sales */
+        SELECT count(*) FROM holds WHERE event_id = $1 AND sector_id = $2 AND status = 'confirmed'`, eventID, sectorID).Scan(&n)
+	if err != nil {
+		return 0, fmt.Errorf("booking/pg: count sector sales: %w", err)
+	}
+	return n, nil
+}
+
+// HoldSectors reads immutable sectors of the holds before locking their rows during pay.
+func (q *queries) HoldSectors(ctx context.Context, holdIDs []uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, `/* booking.hold_sectors */
+        SELECT DISTINCT sector_id FROM holds WHERE id = ANY($1)`, holdIDs)
+	if err != nil {
+		return nil, fmt.Errorf("booking/pg: hold sectors: %w", err)
+	}
+	defer rows.Close()
+	var out []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("booking/pg: scan hold sector: %w", err)
+		}
+		out = append(out, id)
+	}
+	return out, rows.Err()
+}
+
 // CountUserHolds — активные и подтверждённые hold пользователя на мероприятие (лимит FR-7).
 func (q *queries) CountUserHolds(ctx context.Context, eventID, userID uuid.UUID) (int, error) {
 	var n int
@@ -96,9 +135,9 @@ func (q *queries) SeatSold(ctx context.Context, eventID uuid.UUID, seatID int64)
 // InsertHold — новый hold; нарушение uniq_active_hold / holds_taken_uidx → ErrSeatHeld.
 func (q *queries) InsertHold(ctx context.Context, h domain.Hold) error {
 	_, err := q.db.Exec(ctx, `/* booking.insert_hold */
-		INSERT INTO holds (id, event_id, seat_id, user_id, status, expires_at, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-		h.ID, h.EventID, h.SeatID, h.UserID, h.Status, h.ExpiresAt, h.CreatedAt)
+		INSERT INTO holds (id, event_id, seat_id, sector_id, user_id, status, expires_at, created_at, price_minor, sold_count_at_hold)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		h.ID, h.EventID, h.SeatID, h.SectorID, h.UserID, h.Status, h.ExpiresAt, h.CreatedAt, h.PriceMinor, h.SoldCountAtHold)
 	if db.IsUniqueViolation(err, "") {
 		return api.ErrSeatHeld
 	}
@@ -108,11 +147,11 @@ func (q *queries) InsertHold(ctx context.Context, h domain.Hold) error {
 	return nil
 }
 
-const holdCols = "id, event_id, seat_id, user_id, status, expires_at, created_at"
+const holdCols = "id, event_id, seat_id, sector_id, user_id, status, expires_at, created_at, price_minor, sold_count_at_hold"
 
 func scanHold(row pgx.Row) (domain.Hold, error) {
 	var h domain.Hold
-	err := row.Scan(&h.ID, &h.EventID, &h.SeatID, &h.UserID, &h.Status, &h.ExpiresAt, &h.CreatedAt)
+	err := row.Scan(&h.ID, &h.EventID, &h.SeatID, &h.SectorID, &h.UserID, &h.Status, &h.ExpiresAt, &h.CreatedAt, &h.PriceMinor, &h.SoldCountAtHold)
 	return h, err
 }
 

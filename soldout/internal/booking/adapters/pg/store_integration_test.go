@@ -58,7 +58,7 @@ func TestConcurrentHolds_ExactlyOneWins(t *testing.T) {
 	eventID := uuid.MustParse("10000000-0000-4000-8000-000000000001")
 	venueID := uuid.MustParse("20000000-0000-4000-8000-000000000001")
 	svc := app.New(bookingpg.New(pool), fakeCatalog{eventID: eventID, venueID: venueID}, fakeQueue{}, fakePayment{}, fakeTickets{},
-		app.Options{HoldTTL: time.Minute, TicketPriceMinor: 100}, slog.Default())
+		app.Options{HoldTTL: time.Minute}, slog.Default())
 
 	const workers = 20
 	var wg sync.WaitGroup
@@ -167,7 +167,10 @@ func (f fakeCatalog) GetEvent(_ context.Context, id uuid.UUID) (catalogapi.Event
 	return catalogapi.Event{ID: id, VenueID: f.venueID, SalesState: catalogapi.SalesOpen}, nil
 }
 func (f fakeCatalog) GetSeat(_ context.Context, seatID int64) (catalogapi.Seat, error) {
-	return catalogapi.Seat{ID: seatID, VenueID: f.venueID}, nil
+	return catalogapi.Seat{ID: seatID, SectorID: uuid.MustParse("30000000-0000-4000-8000-0000000003e9"), VenueID: f.venueID}, nil
+}
+func (f fakeCatalog) GetSectorPrice(context.Context, uuid.UUID, uuid.UUID) (catalogapi.SectorPrice, error) {
+	return catalogapi.SectorPrice{BasePriceMinor: 100, StepSeats: 100, StepPercent: 10}, nil
 }
 func (f fakeCatalog) SeatMap(context.Context, uuid.UUID) (catalogapi.SeatMap, error) {
 	return catalogapi.SeatMap{}, nil
