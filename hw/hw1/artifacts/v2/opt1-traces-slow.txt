@@ -1,0 +1,23 @@
+TraceQL: { name = "POST /v1/orders/{id}/pay" && duration > 250ms }  (последние 5 минут)
+найдено: 20
+1d848c3cb7e0de589692b0d16319da07    4933 мс  soldout  POST /v1/orders/{id}/pay
+c6d5cad818fae961921f0d70da297780    4568 мс  soldout  POST /v1/orders/{id}/pay
+0134d0ded5fba21e6a67ab2ac415970b    3250 мс  soldout  POST /v1/orders/{id}/pay
+028df0de3a5cffbe03f40d68aefe6769    3031 мс  soldout  POST /v1/orders/{id}/pay
+007c58bda5daed1cf62a870bd5b0933b    2961 мс  soldout  POST /v1/orders/{id}/pay
+02b112f43a3c4d54edf18dbefd1122b5    2951 мс  soldout  POST /v1/orders/{id}/pay
+0161354e5869274a7b52de244dcac34a    2941 мс  soldout  POST /v1/orders/{id}/pay
+019750f994c640f0477442a3c7f51dc5    2827 мс  soldout  POST /v1/orders/{id}/pay
+03478d903c1af85b68faf56070d67e7b    2755 мс  soldout  POST /v1/orders/{id}/pay
+03381beaaba24d98e79df9ce0d881ce6    2654 мс  soldout  POST /v1/orders/{id}/pay
+01ba98df1dfa44ed480142bcbbcb8e67    2550 мс  soldout  POST /v1/orders/{id}/pay
+0203640d65cae921ffb9c705a09268f2    2526 мс  soldout  POST /v1/orders/{id}/pay
+0071d3c51186fbec2f851de75403ef9f    2324 мс  soldout  POST /v1/orders/{id}/pay
+02936d2f75c941c7159c9218eb4557b4    2259 мс  soldout  POST /v1/orders/{id}/pay
+0152d1a755428c24b2f160228315acab    2059 мс  soldout  POST /v1/orders/{id}/pay
+01b13d173e644d49aad55c3cc4f6e38c    1966 мс  soldout  POST /v1/orders/{id}/pay
+0013cf4585f9a9a63d833877657aafbb    1842 мс  soldout  POST /v1/orders/{id}/pay
+022de85eed0c362813aab9636e6c0d80    1701 мс  soldout  POST /v1/orders/{id}/pay
+040789027283d9309583af97b9dd3bc7    1632 мс  soldout  POST /v1/orders/{id}/pay
+00e4f5f4140daf12a4793c2e7acfddee    1412 мс  soldout  POST /v1/orders/{id}/pay
+Grafana:  http://localhost:3000/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%2C%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7B%20name%20%3D%20%5C%22POST%20/v1/orders/%7Bid%7D/pay%5C%22%20%26%26%20duration%20%3E%20250ms%20%7D%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-1h%22%2C%22to%22%3A%22now%22%7D%7D%7D

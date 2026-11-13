@@ -1,0 +1,12 @@
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Seq Scan on booking_sector_sales  (cost=0.00..1.12 rows=1 width=8) (actual time=0.007..0.007 rows=1 loops=1)
+   Filter: ((event_id = '10000000-0000-4000-8000-000000000002'::uuid) AND (sector_id = '30000000-0000-4000-8000-0000000007d1'::uuid))
+   Rows Removed by Filter: 7
+   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=70
+ Planning Time: 0.254 ms
+ Execution Time: 0.028 ms
+(8 rows)
+

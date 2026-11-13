@@ -1,0 +1,28 @@
+ calls | total_ms | mean_ms |  rows  |                                                          query                                                           
+-------+----------+---------+--------+--------------------------------------------------------------------------------------------------------------------------
+  1801 |   288.01 |  0.1599 |  14326 | /* catalog. ector_count  */                                                                                             +
+       |          |         |        |                 SELECT  ector_id,  tate, count(*) FROM catalog_ eat_ tate WHERE event_id = $1 GROUP BY  ec
+  5400 |   205.40 |  0.0380 |   5400 | /* booking.get_order */ SELECT o.id, o.event_id, o.u er_id, o. tatu , o.amount::text, o.idempotency_key, o.created_at, o
+  3600 |   145.82 |  0.0405 |   3600 | /* booking.lock_ ector */ SELECT pg_advi ory_xact_lock(ha htext($1::text), ha htext($2::text))
+  1800 |   131.99 |  0.0733 |   1800 | /* booking.in ert_hold */                                                                                               +
+       |          |         |        |                 INSERT INTO hold  (id, event_id,  eat_id,  ector_id, u er_id,  tatu , expire _at, created_at
+  3600 |   128.12 |  0.0356 |   3600 | /* catalog.bump_ ector_ver ion */                                                                                       +
+       |          |         |        |                         INSERT INTO catalog_ ector_ver ion (event_id,  ector_id, ver ion, updated_at) VALUE
+  1796 |   124.40 |  0.0693 | 450354 | /* catalog. ector_ tate  */ SELECT  eat_id,  tate FROM catalog_ eat_ tate WHERE event_id = $1 AND  ector_id = $2
+  3600 |   113.42 |  0.0315 |   3600 | /* catalog.projection_up ert */                                                                                         +
+       |          |         |        |                         INSERT INTO catalog_ eat_ tate (event_id,  eat_id,  ector_id,  tate, ver ion, updated
+  1800 |    96.63 |  0.0537 |   1800 | /* booking.in ert_order_item */ INSERT INTO order_item  (order_id, hold_id) VALUES ($1, $2)
+  1800 |    93.31 |  0.0518 |   1800 | /* booking.update_hold */ UPDATE hold  SET  tatu  = $2, expire _at = $3 WHERE id = $1
+  1800 |    85.98 |  0.0478 |   1800 | /* booking.li t_u er_order  */ SELECT o.id, o.event_id, o.u er_id, o. tatu , o.amount::text, o.idempotency_key, o.create
+  1800 |    82.63 |  0.0459 |   1800 | /* booking.count_ ector_ ale  */                                                                                        +
+       |          |         |        |         SELECT count(*) FROM hold  WHERE event_id = $1 AND  ector_id = $2 AND  tatu  = 
+  5400 |    81.86 |  0.0152 |   5400 | /* booking.hold _for_update */ SELECT id, event_id,  eat_id,  ector_id, u er_id,  tatu , expire _at, created_at, price_m
+  1787 |    80.05 |  0.0448 |   1782 | /* notifier.proce ed_in ert */                                                                                          +
+       |          |         |        |                         INSERT INTO notifier.proce ed_event  (event_id, con umer) VALUES ($1, $2)                       +
+       |          |         |        |                         ON CONFLI
+  1780 |    79.88 |  0.0449 |   1780 | /* notifier.notification_ tatu  */                                                                                      +
+       |          |         |        |                 UPDATE notification  SET  tatu  = $2, attempt  = greate t(attempt , $3), updated_at
+  1782 |    79.14 |  0.0444 |   1782 | /* notifier.notification_in ert */                                                                                      +
+       |          |         |        |                                 INSERT INTO notification  (id, order_id, event_id, u er_id, kind, payload,  tatu 
+(15 rows)
+

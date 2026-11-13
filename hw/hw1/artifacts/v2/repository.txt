@@ -1,0 +1,78 @@
+Collected: 2026-11-13T16:48:35+03:00
+Branch: hw1
+HEAD: 3254f9efab5a106d3f8b060ff99cfa33ee055de3
+Tag lesson-5: 4a150509941bfb34d7fd889b04394d4fbca01a0b
+--- Branch ancestry ---
+lesson-5 ancestor: YES
+--- Status ---
+ M soldout/internal/booking/adapters/pg/pricing_integration_test.go
+ M soldout/internal/booking/adapters/pg/store.go
+ M soldout/internal/booking/app/service.go
+ M soldout/tools/invariant-checker/main.go
+?? soldout/migrations/0023_confirmed_sector_index.down.sql
+?? soldout/migrations/0023_confirmed_sector_index.up.sql
+?? soldout/migrations/0024_sector_sales_counter.down.sql
+?? soldout/migrations/0024_sector_sales_counter.up.sql
+--- Diff summary ---
+ .../adapters/pg/pricing_integration_test.go        | 40 ++++++++++++++++++++++
+ soldout/internal/booking/adapters/pg/store.go      | 30 +++++++++++++---
+ soldout/internal/booking/app/service.go            | 12 +++++++
+ soldout/tools/invariant-checker/main.go            | 17 ++++++++-
+ 4 files changed, 94 insertions(+), 5 deletions(-)
+--- Latest commits ---
+3254f9e (HEAD -> hw1) [hw1]: Update k6.
+d5c8f66 [hw1]: Update general files.
+c3e0cc6 [hw1]: Added general files.
+4a15050 (tag: lesson-5, origin/hw1) Состояние после занятия 5: outbox, Debezium, Kafka, notifier. Старт HW1
+--- HW submission paths ---
+hw/hw1/HW_1.md
+hw/hw1/artifacts/README.md
+hw/hw1/artifacts/explain-seat-states.txt
+hw/hw1/artifacts/k6-hot-row-summary.json
+hw/hw1/artifacts/k6-smoke-summary.json
+hw/hw1/artifacts/k6-storm-summary.json
+hw/hw1/artifacts/pg_stat_statements-after-storm.txt
+hw/hw1/artifacts/storm-pprof-top.txt
+hw/hw1/variants.md
+soldout/docs/adr/ADR-001-modular-monolith.md
+soldout/docs/adr/ADR-003-event-delivery-and-notifier.md
+soldout/docs/adr/ADR-101-v2.md
+soldout/migrations/0001_init.down.sql
+soldout/migrations/0001_init.up.sql
+soldout/migrations/0002_booking.down.sql
+soldout/migrations/0002_booking.up.sql
+soldout/migrations/0003_payment.down.sql
+soldout/migrations/0003_payment.up.sql
+soldout/migrations/0004_ticketing.down.sql
+soldout/migrations/0004_ticketing.up.sql
+soldout/migrations/0005_notification.down.sql
+soldout/migrations/0005_notification.up.sql
+soldout/migrations/0006_holds_user_active_idx.down.sql
+soldout/migrations/0006_holds_user_active_idx.up.sql
+soldout/migrations/0007_holds_expires_active_idx.down.sql
+soldout/migrations/0007_holds_expires_active_idx.up.sql
+soldout/migrations/0008_tickets_event_id.down.sql
+soldout/migrations/0008_tickets_event_id.up.sql
+soldout/migrations/0009_tickets_event_seat_uidx.down.sql
+soldout/migrations/0009_tickets_event_seat_uidx.up.sql
+soldout/migrations/0010_holds_taken_uidx.down.sql
+soldout/migrations/0010_holds_taken_uidx.up.sql
+soldout/migrations/0011_catalog_seat_state.down.sql
+soldout/migrations/0011_catalog_seat_state.up.sql
+soldout/migrations/0012_catalog_seat_state_backfill.down.sql
+soldout/migrations/0012_catalog_seat_state_backfill.up.sql
+soldout/migrations/0019_orders_user_idx.down.sql
+soldout/migrations/0019_orders_user_idx.up.sql
+soldout/migrations/0020_outbox.down.sql
+soldout/migrations/0020_outbox.up.sql
+soldout/migrations/0021_notifications_dedup.down.sql
+soldout/migrations/0021_notifications_dedup.up.sql
+soldout/migrations/0022_dynamic_pricing.down.sql
+soldout/migrations/0022_dynamic_pricing.up.sql
+soldout/migrations/embed.go
+soldout/spec/soldout-v2.md
+soldout/spec/soldout.md
+--- Versions ---
+go version go1.27.4 linux/amd64
+Docker version 29.9.3, build 5457199
+Docker Compose version v5.7.0

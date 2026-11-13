@@ -1,0 +1,29 @@
+ calls | total_ms | mean_ms |  rows  |                                                          query                                                           
+-------+----------+---------+--------+--------------------------------------------------------------------------------------------------------------------------
+  1802 |   291.80 |  0.1619 |  14334 | /* catalog. ector_count  */                                                                                             +
+       |          |         |        |                 SELECT  ector_id,  tate, count(*) FROM catalog_ eat_ tate WHERE event_id = $1 GROUP BY  ec
+  1801 |   218.73 |  0.1215 |   1801 | /* booking.count_ ector_ ale  */                                                                                        +
+       |          |         |        |         SELECT count(*) FROM hold  WHERE event_id = $1 AND  ector_id = $2 AND  tatu  = 
+  5403 |   211.35 |  0.0391 |   5403 | /* booking.get_order */ SELECT o.id, o.event_id, o.u er_id, o. tatu , o.amount::text, o.idempotency_key, o.created_at, o
+  1801 |   129.37 |  0.0718 |   1801 | /* booking.in ert_hold */                                                                                               +
+       |          |         |        |                 INSERT INTO hold  (id, event_id,  eat_id,  ector_id, u er_id,  tatu , expire _at, created_at
+  1801 |   128.84 |  0.0715 | 453420 | /* catalog. ector_ tate  */ SELECT  eat_id,  tate FROM catalog_ eat_ tate WHERE event_id = $1 AND  ector_id = $2
+  3602 |   113.99 |  0.0316 |   3602 | /* catalog.projection_up ert */                                                                                         +
+       |          |         |        |                         INSERT INTO catalog_ eat_ tate (event_id,  eat_id,  ector_id,  tate, ver ion, updated
+  1801 |    97.90 |  0.0544 |   1801 | /* booking.in ert_order_item */ INSERT INTO order_item  (order_id, hold_id) VALUES ($1, $2)
+  3602 |    91.09 |  0.0253 |   3602 | /* catalog.bump_ ector_ver ion */                                                                                       +
+       |          |         |        |                         INSERT INTO catalog_ ector_ver ion (event_id,  ector_id, ver ion, updated_at) VALUE
+  1801 |    87.49 |  0.0486 |   1801 | /* booking.li t_u er_order  */ SELECT o.id, o.event_id, o.u er_id, o. tatu , o.amount::text, o.idempotency_key, o.create
+  1801 |    83.83 |  0.0465 |   1801 | /* notifier.notification_in ert */                                                                                      +
+       |          |         |        |                                 INSERT INTO notification  (id, order_id, event_id, u er_id, kind, payload,  tatu 
+  1803 |    82.66 |  0.0458 |   1801 | /* notifier.proce ed_in ert */                                                                                          +
+       |          |         |        |                         INSERT INTO notifier.proce ed_event  (event_id, con umer) VALUES ($1, $2)                       +
+       |          |         |        |                         ON CONFLI
+  1801 |    82.17 |  0.0456 |   1801 | /* booking.update_hold */ UPDATE hold  SET  tatu  = $2, expire _at = $3 WHERE id = $1
+  5403 |    81.93 |  0.0152 |   5403 | /* booking.hold _for_update */ SELECT id, event_id,  eat_id,  ector_id, u er_id,  tatu , expire _at, created_at, price_m
+  1756 |    78.46 |  0.0447 |   1756 | /* notifier.notification_ tatu  */                                                                                      +
+       |          |         |        |                 UPDATE notification  SET  tatu  = $2, attempt  = greate t(attempt , $3), updated_at
+  1801 |    72.53 |  0.0403 |   1801 | /* booking.in ert_order */                                                                                              +
+       |          |         |        |                 INSERT INTO order  (id, event_id, u er_id,  tatu , amount, idempotency_key, created_at, upd
+(15 rows)
+

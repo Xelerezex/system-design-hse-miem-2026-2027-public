@@ -1,0 +1,11 @@
+ calls | total_ms | mean_ms |                                               query                                                
+-------+----------+---------+----------------------------------------------------------------------------------------------------
+  1801 |    42.33 |  0.0235 | /* booking.increment_sector_sales */                                                              +
+       |          |         |                 INSERT INTO booking_sector_sales (event_id, sector_id, sold_count)                +
+       |          |         |                 VALUES ($1, $2, $3)                                                               +
+       |          |         |                 ON CONFLICT (event_id, sector_id)                                                 +
+       |          |         |                 DO UPDATE SET sold_count = booking_sector_sales.sold_count + EXCLUDED.sold_count
+  1801 |    10.00 |  0.0056 | /* booking.get_sector_sales */                                                                    +
+       |          |         |                 SELECT sold_count FROM booking_sector_sales WHERE event_id = $1 AND sector_id = $2
+(2 rows)
+

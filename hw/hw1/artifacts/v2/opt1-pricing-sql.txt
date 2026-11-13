@@ -1,0 +1,6 @@
+ calls | total_ms | mean_ms |                                           query                                           
+-------+----------+---------+-------------------------------------------------------------------------------------------
+  1800 |    82.63 |  0.0459 | /* booking.count_sector_sales */                                                         +
+       |          |         |         SELECT count(*) FROM holds WHERE event_id = $1 AND sector_id = $2 AND status = $3
+(1 row)
+

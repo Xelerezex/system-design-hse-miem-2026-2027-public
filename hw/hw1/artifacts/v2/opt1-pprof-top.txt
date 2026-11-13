@@ -1,0 +1,39 @@
+File: soldout
+Build ID: 00095b0868928eabbfaaf3df29d3246203551e41
+Type: cpu
+Time: 2026-11-13 16:39:04 MSK
+Duration: 20s, Total samples = 2.73s (13.65%)
+Showing nodes accounting for 1.54s, 56.41% of 2.73s total
+Dropped 284 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 392
+      flat  flat%   sum%        cum   cum%
+     0.69s 25.27% 25.27%      0.69s 25.27%  internal/runtime/syscall/linux.Syscall6
+     0.14s  5.13% 30.40%      0.14s  5.13%  runtime.futex
+     0.09s  3.30% 33.70%      0.20s  7.33%  encoding/json/v2.makeStructArshaler.func2
+     0.07s  2.56% 36.26%      0.07s  2.56%  runtime.memmove
+     0.04s  1.47% 37.73%      0.04s  1.47%  runtime.memclrNoHeapPointers
+     0.04s  1.47% 39.19%      0.09s  3.30%  runtime.scanObject
+     0.03s  1.10% 40.29%      0.03s  1.10%  encoding/hex.Encode (inline)
+     0.03s  1.10% 41.39%      0.03s  1.10%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+     0.03s  1.10% 42.49%      0.18s  6.59%  runtime.netpoll
+     0.03s  1.10% 43.59%      0.03s  1.10%  runtime.tryDeferToSpanScan
+     0.03s  1.10% 44.69%      0.04s  1.47%  runtime.typePointers.next
+     0.02s  0.73% 45.42%      0.02s  0.73%  context.(*valueCtx).Done
+     0.02s  0.73% 46.15%      0.14s  5.13%  github.com/jackc/pgx/v5/pgconn.(*ResultReader).receiveMessage
+     0.02s  0.73% 46.89%      0.09s  3.30%  github.com/jackc/pgx/v5/pgtype.(*Map).planScan
+     0.02s  0.73% 47.62%      0.02s  0.73%  github.com/prometheus/client_golang/prometheus.(*histogramCounts).observe
+     0.02s  0.73% 48.35%      0.02s  0.73%  go.opentelemetry.io/otel/trace.SpanFromContext
+     0.02s  0.73% 49.08%      0.02s  0.73%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.02s  0.73% 49.82%      0.02s  0.73%  internal/runtime/maps.memHashAES
+     0.02s  0.73% 50.55%      0.04s  1.47%  internal/strconv.AppendUint
+     0.02s  0.73% 51.28%      0.02s  0.73%  runtime.casgstatus
+     0.02s  0.73% 52.01%      0.37s 13.55%  runtime.findRunnable
+     0.02s  0.73% 52.75%      0.15s  5.49%  runtime.mallocgc
+     0.02s  0.73% 53.48%      0.02s  0.73%  runtime.read
+     0.02s  0.73% 54.21%      0.02s  0.73%  runtime.write1
+     0.01s  0.37% 54.58%      0.02s  0.73%  context.(*cancelCtx).cancel
+     0.01s  0.37% 54.95%      0.02s  0.73%  context.(*valueCtx).Value
+     0.01s  0.37% 55.31%      0.02s  0.73%  encoding/json/v2.makeMapArshaler.func2
+     0.01s  0.37% 55.68%      0.03s  1.10%  fmt.(*pp).handleMethods
+     0.01s  0.37% 56.04%      0.03s  1.10%  github.com/google/uuid.encodeHex
+     0.01s  0.37% 56.41%      0.44s 16.12%  github.com/jackc/pgx/v5.(*Conn).Query

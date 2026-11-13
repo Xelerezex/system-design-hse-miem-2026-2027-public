@@ -1,0 +1,39 @@
+File: soldout
+Build ID: 1f5771434693a75a8dfa4296b0de66daa7052555
+Type: cpu
+Time: 2026-11-13 16:40:35 MSK
+Duration: 20s, Total samples = 2.82s (14.10%)
+Showing nodes accounting for 1.60s, 56.74% of 2.82s total
+Dropped 259 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 379
+      flat  flat%   sum%        cum   cum%
+     0.68s 24.11% 24.11%      0.68s 24.11%  internal/runtime/syscall/linux.Syscall6
+     0.12s  4.26% 28.37%      0.12s  4.26%  runtime.futex
+     0.09s  3.19% 31.56%      0.23s  8.16%  encoding/json/v2.makeStructArshaler.func2
+     0.07s  2.48% 34.04%      0.07s  2.48%  runtime.typePointers.next
+     0.06s  2.13% 36.17%      0.06s  2.13%  runtime.memmove
+     0.05s  1.77% 37.94%      0.17s  6.03%  runtime.scanObject
+     0.04s  1.42% 39.36%      0.06s  2.13%  runtime.tryDeferToSpanScan
+     0.03s  1.06% 40.43%      0.04s  1.42%  github.com/felixge/httpsnoop.Wrap
+     0.03s  1.06% 41.49%      0.03s  1.06%  runtime.memclrNoHeapPointers
+     0.03s  1.06% 42.55%      0.03s  1.06%  runtime.write1
+     0.02s  0.71% 43.26%      0.05s  1.77%  encoding/json/v2.makeIntArshaler.func1
+     0.02s  0.71% 43.97%      0.02s  0.71%  github.com/jackc/pgx/v5/pgproto3.(*Bind).Encode
+     0.02s  0.71% 44.68%      0.07s  2.48%  github.com/jackc/pgx/v5/pgtype.(*Map).planScan
+     0.02s  0.71% 45.39%      0.02s  0.71%  go.opentelemetry.io/otel/trace.SpanFromContext
+     0.02s  0.71% 46.10%      0.03s  1.06%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+     0.02s  0.71% 46.81%      0.02s  0.71%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.02s  0.71% 47.52%      1.27s 45.04%  net/http.HandlerFunc.ServeHTTP
+     0.02s  0.71% 48.23%      0.03s  1.06%  reflect.Value.Field
+     0.02s  0.71% 48.94%      0.02s  0.71%  runtime.(*gcControllerState).releaseNextGCMarkWorker
+     0.02s  0.71% 49.65%      0.04s  1.42%  runtime.(*unwinder).next
+     0.02s  0.71% 50.35%      0.02s  0.71%  runtime.acquirem (inline)
+     0.02s  0.71% 51.06%      0.02s  0.71%  runtime.lock2
+     0.02s  0.71% 51.77%      0.02s  0.71%  runtime.mallocgcSmallScanNoHeaderSC2
+     0.02s  0.71% 52.48%      0.02s  0.71%  runtime.nanotime (inline)
+     0.02s  0.71% 53.19%      0.03s  1.06%  runtime.pcvalue
+     0.02s  0.71% 53.90%      0.43s 15.25%  runtime.schedule
+     0.02s  0.71% 54.61%      0.03s  1.06%  runtime.selectgo
+     0.02s  0.71% 55.32%      0.02s  0.71%  runtime.typePointers.nextFast (inline)
+     0.02s  0.71% 56.03%      0.02s  0.71%  strconv.appendEscapedRune
+     0.02s  0.71% 56.74%      0.04s  1.42%  strconv.appendQuotedWith

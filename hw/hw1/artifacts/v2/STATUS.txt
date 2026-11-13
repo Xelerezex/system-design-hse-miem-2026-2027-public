@@ -1,0 +1,15 @@
+=== Verification statuses ===
+diff-check: PASS
+lint-all: PASS
+test: PASS
+test-race: PASS
+=== Existing independent runs ===
+base-r1            exit=0 invariants=PASS
+base-r2            exit=0 invariants=PASS
+base-r3            exit=0 invariants=PASS
+opt1-r1            exit=0 invariants=PASS
+opt1-r2            exit=0 invariants=PASS
+opt1-r3            exit=0 invariants=PASS
+opt2-r1            exit=0 invariants=PASS
+opt2-r2            exit=0 invariants=PASS
+opt2-r3            exit=0 invariants=PASS

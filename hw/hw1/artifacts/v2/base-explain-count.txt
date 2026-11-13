@@ -1,0 +1,14 @@
+                                                                                 QUERY PLAN                                                                                  
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=120.50..120.51 rows=1 width=8) (actual time=0.197..0.198 rows=1 loops=1)
+   Buffers: shared hit=63
+   ->  Seq Scan on holds  (cost=0.00..119.49 rows=402 width=0) (actual time=0.060..0.179 rows=721 loops=1)
+         Filter: ((event_id = '10000000-0000-4000-8000-000000000002'::uuid) AND (sector_id = '30000000-0000-4000-8000-0000000007d1'::uuid) AND (status = 'confirmed'::text))
+         Rows Removed by Filter: 2507
+         Buffers: shared hit=63
+ Planning:
+   Buffers: shared hit=201
+ Planning Time: 0.687 ms
+ Execution Time: 0.251 ms
+(10 rows)
+

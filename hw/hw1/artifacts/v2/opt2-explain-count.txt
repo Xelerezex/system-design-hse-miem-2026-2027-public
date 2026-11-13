@@ -1,0 +1,14 @@
+                                                                    QUERY PLAN                                                                    
+--------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=13.32..13.33 rows=1 width=8) (actual time=0.107..0.107 rows=1 loops=1)
+   Buffers: shared hit=4
+   ->  Index Only Scan using holds_confirmed_sector_idx on holds  (cost=0.28..12.32 rows=402 width=0) (actual time=0.035..0.073 rows=721 loops=1)
+         Index Cond: ((event_id = '10000000-0000-4000-8000-000000000002'::uuid) AND (sector_id = '30000000-0000-4000-8000-0000000007d1'::uuid))
+         Heap Fetches: 19
+         Buffers: shared hit=4
+ Planning:
+   Buffers: shared hit=217
+ Planning Time: 1.454 ms
+ Execution Time: 0.146 ms
+(10 rows)
+
