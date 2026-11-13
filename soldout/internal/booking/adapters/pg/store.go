@@ -78,15 +78,37 @@ func (q *queries) LockSector(ctx context.Context, eventID, sectorID uuid.UUID) e
 	return nil
 }
 
-// CountSectorSales intentionally counts confirmed holds for the unoptimized baseline.
+// CountSectorSales reads the booking-owned counter under the sector advisory lock.
+// Missing rows mean there are no confirmed seats for the sector yet.
 func (q *queries) CountSectorSales(ctx context.Context, eventID, sectorID uuid.UUID) (int, error) {
 	var n int
-	err := q.db.QueryRow(ctx, `/* booking.count_sector_sales */
-        SELECT count(*) FROM holds WHERE event_id = $1 AND sector_id = $2 AND status = 'confirmed'`, eventID, sectorID).Scan(&n)
+	err := q.db.QueryRow(ctx, `/* booking.get_sector_sales */
+		SELECT sold_count FROM booking_sector_sales WHERE event_id = $1 AND sector_id = $2`, eventID, sectorID).Scan(&n)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, nil
+	}
 	if err != nil {
-		return 0, fmt.Errorf("booking/pg: count sector sales: %w", err)
+		return 0, fmt.Errorf("booking/pg: get sector sales: %w", err)
 	}
 	return n, nil
+}
+
+// IncrementSectorSales records newly confirmed seats in the same transaction as pay.
+// The caller holds the event-sector advisory lock and must only count active -> confirmed.
+func (q *queries) IncrementSectorSales(ctx context.Context, eventID, sectorID uuid.UUID, seats int) error {
+	if seats <= 0 {
+		return fmt.Errorf("booking/pg: invalid confirmed seat increment: %d", seats)
+	}
+	_, err := q.db.Exec(ctx, `/* booking.increment_sector_sales */
+		INSERT INTO booking_sector_sales (event_id, sector_id, sold_count)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (event_id, sector_id)
+		DO UPDATE SET sold_count = booking_sector_sales.sold_count + EXCLUDED.sold_count`,
+		eventID, sectorID, seats)
+	if err != nil {
+		return fmt.Errorf("booking/pg: increment sector sales: %w", err)
+	}
+	return nil
 }
 
 // HoldSectors reads immutable sectors of the holds before locking their rows during pay.

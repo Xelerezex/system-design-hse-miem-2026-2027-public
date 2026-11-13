@@ -60,6 +60,14 @@ func TestDynamicPriceAcrossPaidBoundary(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Direct fixture inserts bypass PayOrder, so seed the materialized counter as well.
+	_, err = pool.Exec(ctx, `INSERT INTO booking_sector_sales (event_id, sector_id, sold_count)
+		SELECT event_id, sector_id, count(*) FROM holds
+		WHERE event_id = $1 AND sector_id = $2 AND status = 'confirmed'
+		GROUP BY event_id, sector_id`, eventID, sectorID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	svc := app.New(bookingpg.New(pool), fakeCatalog{eventID: eventID, venueID: venueID}, fakeQueue{}, fakePayment{}, fakeTickets{},
 		app.Options{HoldTTL: time.Minute}, slog.Default())
@@ -117,5 +125,37 @@ func TestDynamicPriceAcrossPaidBoundary(t *testing.T) {
 	}
 	if n != 100 {
 		t.Fatalf("idempotent pay altered sold_count: %d", n)
+	}
+	var counter int
+	if err := pool.QueryRow(ctx, `SELECT sold_count FROM booking_sector_sales WHERE event_id = $1 AND sector_id = $2`, eventID, sectorID).Scan(&counter); err != nil {
+		t.Fatal(err)
+	}
+	if counter != n {
+		t.Fatalf("counter after repeated pay = %d, actual confirmed = %d", counter, n)
+	}
+	// An order with two seats increments exactly twice, not twice on a payment retry.
+	multiUser := uuid.New()
+	h4, err := svc.CreateHold(ctx, api.CreateHoldInput{EventID: eventID, SeatID: 4, UserID: multiUser, AdmissionToken: "ok"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h5, err := svc.CreateHold(ctx, api.CreateHoldInput{EventID: eventID, SeatID: 5, UserID: multiUser, AdmissionToken: "ok"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	multiOrder, _, err := svc.CreateOrder(ctx, api.CreateOrderInput{HoldIDs: []uuid.UUID{h4.ID, h5.ID}, UserID: multiUser, IdempotencyKey: "price-multi"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if _, err := svc.PayOrder(ctx, api.PayOrderInput{OrderID: multiOrder.ID}); err != nil {
+			t.Fatalf("pay multi-seat attempt %d: %v", i, err)
+		}
+	}
+	if err := pool.QueryRow(ctx, `SELECT sold_count FROM booking_sector_sales WHERE event_id = $1 AND sector_id = $2`, eventID, sectorID).Scan(&counter); err != nil {
+		t.Fatal(err)
+	}
+	if counter != 102 {
+		t.Fatalf("multi-seat pay and retry: got %d, want 102", counter)
 	}
 }

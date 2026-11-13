@@ -54,6 +54,21 @@ var invariantI7 = invariant{"I7", "сумма заказа равна сумме
         FROM order_items oi JOIN holds h ON h.id = oi.hold_id WHERE oi.order_id = o.id
     )`}
 
+// I8 checks that the booking counter agrees with confirmed holds, including missing rows.
+var invariantI8 = invariant{"I8", "счётчик проданных мест сектора совпадает с confirmed holds", `
+    SELECT count(*) FROM (
+        SELECT coalesce(a.event_id, b.event_id) AS event_id,
+               coalesce(a.sector_id, b.sector_id) AS sector_id
+        FROM (
+            SELECT event_id, sector_id, count(*) AS n
+            FROM holds WHERE status = 'confirmed'
+            GROUP BY event_id, sector_id
+        ) a
+        FULL OUTER JOIN booking_sector_sales b
+            ON b.event_id = a.event_id AND b.sector_id = a.sector_id
+        WHERE coalesce(a.n, 0) <> coalesce(b.sold_count, 0)
+    ) mismatches`}
+
 var invariantI6 = invariant{"I6", "проекция карты (catalog_seat_state) совпадает с истиной (holds) — с занятия 2", `
 		SELECT (SELECT count(*) FROM (
 			SELECT h.event_id, h.seat_id, CASE h.status WHEN 'confirmed' THEN 'sold' ELSE 'held' END AS state
@@ -95,7 +110,7 @@ func main() {
 	}
 	defer pool.Close()
 
-	checks := append(append([]invariant{}, invariants...), invariantI7)
+	checks := append(append([]invariant{}, invariants...), invariantI7, invariantI8)
 	if *withI6 {
 		checks = append(checks, invariantI6)
 	}

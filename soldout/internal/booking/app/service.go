@@ -28,6 +28,7 @@ type Tx interface {
 	LockSeat(ctx context.Context, eventID uuid.UUID, seatID int64) error
 	LockSector(ctx context.Context, eventID, sectorID uuid.UUID) error
 	CountSectorSales(ctx context.Context, eventID, sectorID uuid.UUID) (int, error)
+	IncrementSectorSales(ctx context.Context, eventID, sectorID uuid.UUID, seats int) error
 	HoldSectors(ctx context.Context, holdIDs []uuid.UUID) ([]uuid.UUID, error)
 	CountUserHolds(ctx context.Context, eventID, userID uuid.UUID) (int, error)
 	SeatSold(ctx context.Context, eventID uuid.UUID, seatID int64) (bool, error)
@@ -391,6 +392,7 @@ func (s *Service) payOrder(ctx context.Context, in api.PayOrderInput) (api.Order
 		if err != nil {
 			return err
 		}
+		newSales := make(map[uuid.UUID]int)
 		for i := range holds {
 			if err := holds[i].Confirm(now); err != nil {
 				// деньги списаны, место потеряно: на L1 фиксируем failed и пишем в лог; компенсация — занятие 7
@@ -407,6 +409,16 @@ func (s *Service) payOrder(ctx context.Context, in api.PayOrderInput) (api.Order
 				return err
 			}
 			confirmed = append(confirmed, holds[i])
+			newSales[holds[i].SectorID]++
+		}
+		// The counter increment is atomic with hold confirmation and order payment.
+		// Sector advisory locks are held until commit, so no hold sees a partial tier.
+		for _, sectorID := range sectors {
+			if n := newSales[sectorID]; n > 0 {
+				if err := tx.IncrementSectorSales(ctx, o.EventID, sectorID, n); err != nil {
+					return err
+				}
+			}
 		}
 		if err := o.MarkPaid(now); err != nil {
 			return err
